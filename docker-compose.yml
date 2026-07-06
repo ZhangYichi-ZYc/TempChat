@@ -1,0 +1,17 @@
+services:
+  tempchat:
+    build: .
+    container_name: tempchat
+    ports:
+      - "3000:3000"
+    volumes:
+      - tempchat_data:/app/data
+      - tempchat_uploads:/app/uploads
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    restart: unless-stopped
+
+volumes:
+  tempchat_data:
+  tempchat_uploads:
