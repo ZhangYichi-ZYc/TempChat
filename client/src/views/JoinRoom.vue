@@ -39,23 +39,17 @@
         <p class="select-hint">请选择你的身份</p>
 
         <div class="identity-options">
-          <el-button
-            size="large"
-            class="identity-btn"
-            @click="selectParty('a')"
-          >
-            <el-icon><User /></el-icon>
-            <span>{{ partyA }}</span>
-          </el-button>
+          <div class="identity-btn" @click="selectParty('a')">
+            <el-icon :size="20"><User /></el-icon>
+            <span class="identity-name">{{ partyA }}</span>
+            <el-icon class="arrow-icon"><ArrowRight /></el-icon>
+          </div>
 
-          <el-button
-            size="large"
-            class="identity-btn"
-            @click="selectParty('b')"
-          >
-            <el-icon><User /></el-icon>
-            <span>{{ partyB }}</span>
-          </el-button>
+          <div class="identity-btn" @click="selectParty('b')">
+            <el-icon :size="20"><User /></el-icon>
+            <span class="identity-name">{{ partyB }}</span>
+            <el-icon class="arrow-icon"><ArrowRight /></el-icon>
+          </div>
         </div>
       </template>
     </el-card>
@@ -149,12 +143,36 @@ function selectParty(sender) {
 }
 
 .identity-btn {
-  width: 100%;
-  height: 56px;
-  font-size: 16px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 18px;
+  border: 1px solid #dcdfe6;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  user-select: none;
+}
+
+.identity-btn:hover {
+  border-color: #409eff;
+  background: #ecf5ff;
+}
+
+.identity-name {
+  flex: 1;
+  font-size: 16px;
+  color: #303133;
+}
+
+.arrow-icon {
+  color: #c0c4cc;
+  flex-shrink: 0;
+}
+
+.identity-btn:hover .arrow-icon {
+  color: #409eff;
 }
 </style>
