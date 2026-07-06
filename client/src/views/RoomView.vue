@@ -1,19 +1,19 @@
 <template>
-  <div class="room-container">
+  <div class="room-shell">
     <!-- Loading -->
-    <div v-if="state === 'loading'" class="loading-state">
-      <el-icon class="loading-icon" :size="32"><Loading /></el-icon>
+    <div v-if="state === 'loading'" class="state-center">
+      <el-icon class="spin" :size="28"><Loading /></el-icon>
       <p>加载中...</p>
     </div>
 
-    <!-- Init: room doesn't exist yet -->
+    <!-- Init -->
     <InitRoom
       v-else-if="state === 'init'"
       :roomId="roomId"
       @created="onCreated"
     />
 
-    <!-- Join: room exists, need to select identity -->
+    <!-- Join -->
     <JoinRoom
       v-else-if="state === 'join'"
       :roomId="roomId"
@@ -23,7 +23,7 @@
       @joined="onJoined"
     />
 
-    <!-- Chat: actively in the room -->
+    <!-- Chat -->
     <ChatRoom
       v-else-if="state === 'chat'"
       :roomId="roomId"
@@ -33,10 +33,10 @@
     />
 
     <!-- Error -->
-    <div v-else class="error-state">
-      <el-result icon="error" title="出错了" sub-title="请检查房间地址是否正确">
+    <div v-else class="state-center">
+      <el-result icon="error" title="加载失败" sub-title="请检查房间地址是否正确">
         <template #extra>
-          <el-button type="primary" @click="initRoom">重试</el-button>
+          <el-button @click="initRoom">重试</el-button>
         </template>
       </el-result>
     </div>
@@ -91,29 +91,22 @@ onMounted(initRoom);
 </script>
 
 <style scoped>
-.room-container { min-height: 100vh; }
+.room-shell { min-height: 100vh; }
 
-.loading-state {
+.state-center {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  color: #909399;
+  color: var(--text-secondary);
 }
 
-.loading-icon { animation: spin 1s linear infinite; }
+.spin { animation: spin 1s linear infinite; }
 
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
-}
-
-.error-state {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 </style>

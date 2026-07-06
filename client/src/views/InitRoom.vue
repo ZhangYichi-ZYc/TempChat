@@ -1,13 +1,13 @@
 <template>
-  <div class="init-room-wrapper">
-    <el-card class="init-card">
-      <template #header>
-        <div class="card-header">
-          <h2>创建新对话</h2>
-          <p class="room-id-label">房间: {{ roomId }}</p>
-        </div>
-      </template>
+  <div class="init-wrapper">
+    <div class="init-card">
+      <!-- Header -->
+      <div class="card-header">
+        <h1>创建新对话</h1>
+        <p class="room-badge">chat.zhangyichi.cn/<strong>{{ roomId }}</strong></p>
+      </div>
 
+      <!-- Form -->
       <el-form
         ref="formRef"
         :model="form"
@@ -18,44 +18,50 @@
         <el-form-item label="甲方身份" prop="partyA">
           <el-input
             v-model="form.partyA"
-            placeholder="例如：张三"
+            placeholder="对方如何称呼你？"
             maxlength="30"
             show-word-limit
+            size="large"
           />
         </el-form-item>
 
         <el-form-item label="乙方身份" prop="partyB">
           <el-input
             v-model="form.partyB"
-            placeholder="例如：李四"
+            placeholder="对方的称呼？"
             maxlength="30"
             show-word-limit
+            size="large"
           />
         </el-form-item>
 
-        <el-form-item label="房间密码（选填）" prop="password">
+        <el-form-item label="房间密码" prop="password">
           <el-input
             v-model="form.password"
             type="password"
-            placeholder="留空则不设置密码"
+            placeholder="留空则不设密码"
             show-password
             maxlength="50"
+            size="large"
           />
+          <template #extra>
+            <span class="field-hint">设置密码后，进入房间需要验证</span>
+          </template>
         </el-form-item>
 
-        <el-form-item>
+        <el-form-item class="submit-row">
           <el-button
             type="primary"
             size="large"
             :loading="submitting"
             @click="handleSubmit"
-            style="width: 100%"
+            class="submit-btn"
           >
             创建房间
           </el-button>
         </el-form-item>
       </el-form>
-    </el-card>
+    </div>
   </div>
 </template>
 
@@ -89,11 +95,7 @@ const rules = {
 
 async function handleSubmit() {
   if (!formRef.value) return;
-  try {
-    await formRef.value.validate();
-  } catch {
-    return;
-  }
+  try { await formRef.value.validate(); } catch { return; }
 
   submitting.value = true;
   try {
@@ -110,31 +112,62 @@ async function handleSubmit() {
 </script>
 
 <style scoped>
-.init-room-wrapper {
+.init-wrapper {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 24px;
 }
 
 .init-card {
   width: 100%;
   max-width: 420px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 36px 32px;
 }
 
 .card-header {
   text-align: center;
+  margin-bottom: 32px;
 }
 
-.card-header h2 {
-  font-size: 22px;
-  color: #303133;
-  margin-bottom: 4px;
+.card-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
 }
 
-.room-id-label {
+.room-badge {
   font-size: 13px;
-  color: #909399;
+  color: var(--text-secondary);
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+
+.room-badge strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.field-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+
+.submit-row {
+  margin-top: 8px;
+}
+
+.submit-btn {
+  width: 100%;
+  height: 48px;
+  font-size: 16px;
+  border-radius: var(--radius-md);
 }
 </style>

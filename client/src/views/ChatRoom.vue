@@ -1,41 +1,40 @@
 <template>
   <div class="chat-room">
-    <!-- Header -->
+    <!-- Dark header -->
     <header class="chat-header">
-      <div class="header-left">
-        <el-tag :type="sender === 'a' ? 'primary' : 'success'" size="large">
-          {{ myName }}
-        </el-tag>
-        <span class="header-divider">↔</span>
-        <span class="other-name">{{ otherName }}</span>
+      <div class="header-main">
+        <span class="header-party">{{ myName }}</span>
+        <span class="header-divider">·</span>
+        <span class="header-party is-other">{{ otherName }}</span>
       </div>
-      <div class="header-right">
-        <span class="room-badge">#{{ roomId }}</span>
-      </div>
+      <span class="header-room">#{{ roomId }}</span>
     </header>
 
-    <!-- Message list -->
+    <!-- Messages -->
     <MessageList
       :messages="messages"
       :mySender="sender"
       :partyA="partyA"
       :partyB="partyB"
-      ref="messageListRef"
+      ref="msgListRef"
     />
 
-    <!-- Input area -->
-    <div class="input-area">
+    <!-- Input dock -->
+    <footer class="input-dock">
       <MessageInput
         :disabled="!connected"
         @send="handleSendText"
       />
-      <FileUpload
-        :roomId="roomId"
-        :sender="sender"
-        :disabled="!connected"
-        @uploaded="handleFileUploaded"
-      />
-    </div>
+      <div class="dock-actions">
+        <FileUpload
+          :roomId="roomId"
+          :sender="sender"
+          :disabled="!connected"
+          @uploaded="handleFileUploaded"
+        />
+        <span v-if="!connected" class="disconnected-badge">连接中...</span>
+      </div>
+    </footer>
   </div>
 </template>
 
@@ -56,25 +55,21 @@ const props = defineProps({
 
 const messages = ref([]);
 const connected = ref(false);
-const messageListRef = ref(null);
+const msgListRef = ref(null);
 let socket = null;
 
 const myName = computed(() => props.sender === 'a' ? props.partyA : props.partyB);
 const otherName = computed(() => props.sender === 'a' ? props.partyB : props.partyA);
 
-// Load history
 async function loadHistory() {
   try {
     const res = await getMessages(props.roomId);
     messages.value = res.messages;
     await nextTick();
     scrollToBottom();
-  } catch (e) {
-    console.error('Failed to load messages:', e);
-  }
+  } catch (e) { console.error('Failed to load messages:', e); }
 }
 
-// Connect Socket.io
 function connectSocket() {
   socket = io('/', { transports: ['websocket', 'polling'] });
 
@@ -83,25 +78,21 @@ function connectSocket() {
     socket.emit('join-room', { roomId: props.roomId, sender: props.sender });
   });
 
-  socket.on('disconnect', () => {
-    connected.value = false;
-  });
+  socket.on('disconnect', () => { connected.value = false; });
 
   socket.on('new-message', (msg) => {
     messages.value.push(msg);
     nextTick(() => scrollToBottom());
   });
 
-  socket.on('user-joined', ({ sender }) => {
-    const name = sender === 'a' ? props.partyA : props.partyB;
+  socket.on('user-joined', ({ sender: who }) => {
+    const name = who === 'a' ? props.partyA : props.partyB;
     messages.value.push({
       id: Date.now(),
       room_id: props.roomId,
       sender: '__system__',
       content: `${name} 加入了对话`,
-      file_name: null,
-      file_path: null,
-      file_size: null,
+      file_name: null, file_path: null, file_size: null,
       created_at: new Date().toISOString()
     });
     nextTick(() => scrollToBottom());
@@ -110,25 +101,15 @@ function connectSocket() {
 
 function handleSendText(content) {
   if (!content.trim()) return;
-  socket.emit('send-message', {
-    roomId: props.roomId,
-    sender: props.sender,
-    content: content.trim()
-  });
+  socket.emit('send-message', { roomId: props.roomId, sender: props.sender, content: content.trim() });
 }
 
 function handleFileUploaded(fileInfo) {
-  socket.emit('file-message', {
-    roomId: props.roomId,
-    sender: props.sender,
-    file: fileInfo
-  });
+  socket.emit('file-message', { roomId: props.roomId, sender: props.sender, file: fileInfo });
 }
 
 function scrollToBottom() {
-  if (messageListRef.value) {
-    messageListRef.value.scrollToBottom();
-  }
+  msgListRef.value?.scrollToBottom();
 }
 
 onMounted(async () => {
@@ -137,10 +118,7 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
-  if (socket) {
-    socket.disconnect();
-    socket = null;
-  }
+  if (socket) { socket.disconnect(); socket = null; }
 });
 </script>
 
@@ -149,47 +127,67 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  max-width: 800px;
+  max-width: 720px;
   margin: 0 auto;
-  background: #fff;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
 }
 
+/* ===== Header ===== */
 .chat-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 20px;
-  background: #fff;
-  border-bottom: 1px solid #ebeef5;
+  padding: 14px 24px;
+  background: var(--bubble-own);
   flex-shrink: 0;
 }
 
-.header-left {
+.header-main {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.header-party {
+  color: var(--bubble-own-text);
 }
 
 .header-divider {
-  color: #c0c4cc;
+  color: rgba(240, 239, 232, 0.35);
+  font-weight: 400;
 }
 
-.other-name {
-  font-size: 15px;
-  color: #606266;
+.header-party.is-other {
+  color: rgba(240, 239, 232, 0.7);
+  font-weight: 400;
 }
 
-.room-badge {
+.header-room {
   font-size: 12px;
-  color: #c0c4cc;
-  font-family: monospace;
+  color: rgba(240, 239, 232, 0.45);
+  font-family: 'SF Mono', 'Fira Code', monospace;
 }
 
-.input-area {
+/* ===== Input dock ===== */
+.input-dock {
   flex-shrink: 0;
-  border-top: 1px solid #ebeef5;
-  padding: 12px 20px;
-  background: #fafafa;
+  padding: 14px 20px 16px;
+  border-top: 1px solid var(--border-light);
+  background: var(--bg-card);
+}
+
+.dock-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.disconnected-badge {
+  font-size: 12px;
+  color: var(--text-muted);
 }
 </style>

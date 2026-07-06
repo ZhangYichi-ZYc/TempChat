@@ -1,46 +1,43 @@
 <template>
   <div class="message-list" ref="listRef">
     <div
-      v-for="msg in messages"
+      v-for="(msg, idx) in messages"
       :key="msg.id"
-      class="message-item"
+      class="msg-row"
       :class="{
         'is-mine': msg.sender === mySender,
-        'is-system': msg.sender === '__system__'
+        'is-system': msg.sender === '__system__',
+        'is-new': idx === messages.length - 1 && msg.sender !== '__system__'
       }"
     >
       <!-- System message -->
-      <div v-if="msg.sender === '__system__'" class="system-msg">
-        {{ msg.content }}
-      </div>
+      <p v-if="msg.sender === '__system__'" class="sys-msg">{{ msg.content }}</p>
 
-      <!-- Normal message -->
+      <!-- Chat bubble -->
       <template v-else>
-        <div class="msg-bubble" :class="{ 'mine': msg.sender === mySender }">
-          <div class="msg-meta">
-            <span class="msg-sender">
-              {{ msg.sender === 'a' ? partyA : partyB }}
-            </span>
-          </div>
+        <div class="bubble" :class="{ mine: msg.sender === mySender }">
+          <!-- Sender label -->
+          <span class="bubble-sender">
+            {{ msg.sender === 'a' ? partyA : partyB }}
+          </span>
 
-          <!-- Text content -->
-          <div v-if="msg.content" class="msg-content">{{ msg.content }}</div>
+          <!-- Text -->
+          <p v-if="msg.content" class="bubble-text">{{ msg.content }}</p>
 
-          <!-- File attachment -->
-          <div v-if="msg.file_name" class="msg-file">
-            <el-link
-              :href="`/files/${msg.file_path}`"
-              target="_blank"
-              :underline="false"
-              type="primary"
-            >
-              <el-icon><Document /></el-icon>
-              {{ msg.file_name }}
-              <span class="file-size">({{ formatSize(msg.file_size) }})</span>
-            </el-link>
-          </div>
+          <!-- File -->
+          <a
+            v-if="msg.file_name"
+            :href="`/files/${msg.file_path}`"
+            target="_blank"
+            class="bubble-file"
+          >
+            <el-icon :size="16"><Document /></el-icon>
+            <span class="file-name">{{ msg.file_name }}</span>
+            <span class="file-size">{{ formatSize(msg.file_size) }}</span>
+          </a>
 
-          <div class="msg-time">{{ formatTime(msg.created_at) }}</div>
+          <!-- Time -->
+          <time class="bubble-time">{{ formatTime(msg.created_at) }}</time>
         </div>
       </template>
     </div>
@@ -75,12 +72,8 @@ function formatTime(ts) {
 function formatSize(bytes) {
   if (!bytes) return '0 B';
   const units = ['B', 'KB', 'MB', 'GB'];
-  let i = 0;
-  let size = bytes;
-  while (size >= 1024 && i < units.length - 1) {
-    size /= 1024;
-    i++;
-  }
+  let i = 0, size = bytes;
+  while (size >= 1024 && i < units.length - 1) { size /= 1024; i++; }
   return `${size.toFixed(i > 0 ? 1 : 0)} ${units[i]}`;
 }
 
@@ -91,84 +84,142 @@ defineExpose({ scrollToBottom });
 .message-list {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
+  padding: 20px 24px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 6px;
+  background: var(--bg-card);
 }
 
-.system-msg {
+/* ===== System ===== */
+.sys-msg {
   text-align: center;
-  font-size: 13px;
-  color: #909399;
-  padding: 4px 0;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  padding: 8px 0;
+  font-style: italic;
 }
 
-.message-item {
+/* ===== Row ===== */
+.msg-row {
   display: flex;
+  margin-bottom: 2px;
 }
 
-.message-item.is-mine {
+.msg-row.is-mine {
   justify-content: flex-end;
 }
 
-.msg-bubble {
-  max-width: 70%;
-  padding: 10px 14px;
-  border-radius: 12px;
-  background: #f0f2f5;
+/* ===== Bubble ===== */
+.bubble {
+  max-width: 72%;
+  padding: 12px 16px;
+  border-radius: var(--radius-lg);
+  background: var(--bubble-other);
+  color: var(--bubble-other-text);
+  position: relative;
 }
 
-.msg-bubble.mine {
-  background: #409eff;
-  color: #fff;
+.bubble.mine {
+  background: var(--bubble-own);
+  color: var(--bubble-own-text);
+  border-bottom-right-radius: 6px;
 }
 
-.msg-meta {
-  margin-bottom: 4px;
+.bubble:not(.mine) {
+  border-bottom-left-radius: 6px;
 }
 
-.msg-sender {
-  font-size: 12px;
-  color: #909399;
+/* Sender label */
+.bubble-sender {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  margin-bottom: 3px;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
 }
 
-.msg-bubble.mine .msg-sender {
-  color: rgba(255, 255, 255, 0.8);
+.bubble.mine .bubble-sender {
+  color: rgba(240, 239, 232, 0.55);
 }
 
-.msg-content {
+/* Text */
+.bubble-text {
   font-size: 15px;
-  line-height: 1.5;
+  line-height: 1.6;
   word-break: break-word;
+  white-space: pre-wrap;
 }
 
-.msg-file {
-  margin-top: 6px;
+/* File link — amber on both backgrounds */
+.bubble-file {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(199, 125, 86, 0.1);
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: background var(--transition-fast);
 }
 
-.msg-file .el-link {
-  font-size: 14px;
+.bubble.mine .bubble-file {
+  background: rgba(199, 125, 86, 0.2);
+  color: #e8b899;
+}
+
+.bubble-file:hover {
+  background: rgba(199, 125, 86, 0.18);
+}
+
+.bubble.mine .bubble-file:hover {
+  background: rgba(199, 125, 86, 0.3);
+}
+
+.file-name {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .file-size {
   font-size: 11px;
-  color: #909399;
-  margin-left: 4px;
+  opacity: 0.7;
+  flex-shrink: 0;
 }
 
-.msg-bubble.mine .file-size {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.msg-time {
-  font-size: 11px;
-  color: #c0c4cc;
-  margin-top: 4px;
+/* Time */
+.bubble-time {
+  display: block;
+  font-size: 10.5px;
+  margin-top: 6px;
+  color: var(--text-muted);
   text-align: right;
 }
 
-.msg-bubble.mine .msg-time {
-  color: rgba(255, 255, 255, 0.6);
+.bubble.mine .bubble-time {
+  color: rgba(240, 239, 232, 0.4);
+}
+
+/* New message animation */
+.is-new .bubble {
+  animation: msgIn 350ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes msgIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>
