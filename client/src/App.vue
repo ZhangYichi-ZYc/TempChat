@@ -22,10 +22,12 @@
   --text-secondary: #787670;
   --text-muted: #a8a59d;
 
-  --bubble-own: #1e1e26;
-  --bubble-own-text: #f0efe8;
-  --bubble-other: #eae6df;
-  --bubble-other-text: #1c1c1c;
+  --bubble-own: #dce4d7;
+  --bubble-own-text: #2c2c2c;
+  --bubble-own-sender: #7b9b6a;
+  --bubble-other: #efece5;
+  --bubble-other-text: #2c2c2c;
+  --bubble-other-sender: #b0a89e;
 
   --accent: #c77d56;
   --accent-hover: #b06b44;

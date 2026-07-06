@@ -41,7 +41,7 @@ function send() {
 .msg-input-row {
   display: flex;
   gap: 10px;
-  align-items: flex-end;
+  align-items: center;
 }
 
 .text-input {

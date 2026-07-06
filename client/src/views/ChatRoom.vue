@@ -139,7 +139,8 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: space-between;
   padding: 14px 24px;
-  background: var(--bubble-own);
+  background: #faf8f4;
+  border-bottom: 1px solid var(--border-light);
   flex-shrink: 0;
 }
 
@@ -152,22 +153,22 @@ onBeforeUnmount(() => {
 }
 
 .header-party {
-  color: var(--bubble-own-text);
+  color: var(--text-primary);
 }
 
 .header-divider {
-  color: rgba(240, 239, 232, 0.35);
+  color: var(--text-muted);
   font-weight: 400;
 }
 
 .header-party.is-other {
-  color: rgba(240, 239, 232, 0.7);
+  color: var(--text-secondary);
   font-weight: 400;
 }
 
 .header-room {
   font-size: 12px;
-  color: rgba(240, 239, 232, 0.45);
+  color: var(--text-muted);
   font-family: 'SF Mono', 'Fira Code', monospace;
 }
 

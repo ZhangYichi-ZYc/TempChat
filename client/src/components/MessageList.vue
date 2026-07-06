@@ -136,12 +136,12 @@ defineExpose({ scrollToBottom });
   font-size: 11.5px;
   font-weight: 600;
   margin-bottom: 3px;
-  color: var(--text-muted);
+  color: var(--bubble-other-sender);
   letter-spacing: 0.02em;
 }
 
 .bubble.mine .bubble-sender {
-  color: rgba(240, 239, 232, 0.55);
+  color: var(--bubble-own-sender);
 }
 
 /* Text */
@@ -152,7 +152,7 @@ defineExpose({ scrollToBottom });
   white-space: pre-wrap;
 }
 
-/* File link — amber on both backgrounds */
+/* File link — amber accent, readable on both light backgrounds */
 .bubble-file {
   display: inline-flex;
   align-items: center;
@@ -160,7 +160,7 @@ defineExpose({ scrollToBottom });
   margin-top: 8px;
   padding: 8px 12px;
   border-radius: var(--radius-sm);
-  background: rgba(199, 125, 86, 0.1);
+  background: rgba(199, 125, 86, 0.08);
   color: var(--accent);
   text-decoration: none;
   font-size: 13.5px;
@@ -168,17 +168,8 @@ defineExpose({ scrollToBottom });
   transition: background var(--transition-fast);
 }
 
-.bubble.mine .bubble-file {
-  background: rgba(199, 125, 86, 0.2);
-  color: #e8b899;
-}
-
 .bubble-file:hover {
-  background: rgba(199, 125, 86, 0.18);
-}
-
-.bubble.mine .bubble-file:hover {
-  background: rgba(199, 125, 86, 0.3);
+  background: rgba(199, 125, 86, 0.15);
 }
 
 .file-name {
@@ -201,10 +192,6 @@ defineExpose({ scrollToBottom });
   margin-top: 6px;
   color: var(--text-muted);
   text-align: right;
-}
-
-.bubble.mine .bubble-time {
-  color: rgba(240, 239, 232, 0.4);
 }
 
 /* New message animation */
